@@ -5,18 +5,6 @@ const { router, get, post, put, del } = require('microrouter')
 var Datastore = require('nedb')
     , friends = new Datastore({ filename: './data.db', autoload: true });
 
-//   var doc = {
-//             "_id": 3,
-//             "name": "jim",
-//             "age": 20
-//         };
-
-// db.insert(doc, function (err, newDoc) {   // Callback is optional
-//   // newDoc is the newly inserted document, including its _id
-//   // newDoc has no key called notToBeSaved since its value was undefined
-// });
-
-
 let friendsList = []
 
 const notfound = (req, res) => send(res, 404, 'Not found route')
@@ -45,7 +33,7 @@ const getList = () => {
 const getFriends = async (req, res) => {
     const results = await getList()
     friendsList = results
-    // console.log('2 listOfFriends', listOfFriends)
+    console.log('getFriends', results)
     return results
 }
 //end of new nedb getFriends
@@ -59,7 +47,7 @@ const getFriends = async (req, res) => {
 //new nedb getFriend
 // not working yet still needs work but skipping it for now because the UI part is not done yet
 const getFriend = (req, res) => {
-    friends.findOne({ _id: 2 }, function (err, doc) {
+    friends.findOne({ _id: parseInt(id)}, function (err, doc) {
         console.log('Found user:', doc.name);
     });
 }
@@ -75,8 +63,8 @@ const getFriend = (req, res) => {
 //new nedb deleteFriend  // below is working
 const byByUser = (id) => {
     return new Promise((resolve, reject) => {
-        friends.remove({ _id: parseInt(id) }, {}, function (err, numDeleted) {
-            console.log('Deleted', numDeleted, 'user(id)', id);
+        friends.remove({ _id: parseInt(id)}, {}, function (err, numDeleted) {
+            console.log('numDeleted', numDeleted, 'user id:', id);
             resolve(numDeleted)
         });
     })
@@ -85,7 +73,7 @@ const byByUser = (id) => {
 const deleteFriend = async (req, res) => {
     let id = req.params._id
     const results = await byByUser(id)
-    console.log('deleteFriend', results)
+    console.log('deleteFriend:', req.params)
     return results
 }
 //end of new nedb deleteFriend
@@ -111,7 +99,7 @@ const newUser = (friend) => {
             , age: friend.age
         };
 
-        friends.insert(doc, function (err, newDoc) {   
+        friends.insert(doc, function (err, newDoc) {
             // console.log('newDoc', newDoc);
             resolve(newDoc)
         });
@@ -121,7 +109,7 @@ const newUser = (friend) => {
 const createFriend = async (req, res) => {
     const data = await json(req)
     const results = await newUser(data);
-    console.log('createFriend', results)
+    console.log('createFriend:', results)
     return send(res, 200, results)
 }
 //end of new nedb createFriend
@@ -139,17 +127,29 @@ const createFriend = async (req, res) => {
 // }
 
 //new nedb updateFriend // below is not working
+const friendUpdate = (friend) => {
+    return new Promise((resolve, reject) => {
+        let doc = {
+            _id: friend._id
+            , name: friend.name
+            , age: friend.age
+        };
+
+        friends.update({ _id: parseInt(friend._id) }, doc, {}, function (err, numReplaced) {
+            resolve(doc)
+        });
+    })
+}
+
 const updateFriend = async (req, res) => {
-    // const data = await json(req)
-    // const index = await friends.findIndex(friend => friend._id == req.params._id)
-    // const friend = await friends[index]
-    // friend["name"] = data.name
-    // friend["age"] = data.age
-    // const results = await friends.splice(index, 1, friend);
+    const data = await json(req)
+    const results = await friendUpdate(data);
+    console.log('updateFriend:', results)
     return send(res, 200, results)
 }
 //end of new nedb updateFriend
 
+getFriends() // added function call to render friends without hitting endpoint first because that was causing issues with the other functions if endpoint was not hit first
 
 module.exports = cors(
     router(
