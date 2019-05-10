@@ -64,7 +64,7 @@ const getFriend = (req, res) => {
 const byByUser = (id) => {
     return new Promise((resolve, reject) => {
         friends.remove({ _id: parseInt(id)}, {}, function (err, numDeleted) {
-            console.log('numDeleted', numDeleted, 'user id:', id);
+            console.log('numDeleted', numDeleted);
             resolve(numDeleted)
         });
     })
@@ -107,8 +107,8 @@ const newUser = (friend) => {
 }
 
 const createFriend = async (req, res) => {
-    const data = await json(req)
-    const results = await newUser(data);
+    const friend = await json(req)
+    const results = await newUser(friend);
     console.log('createFriend:', results)
     return send(res, 200, results)
 }
@@ -142,8 +142,8 @@ const friendUpdate = (friend) => {
 }
 
 const updateFriend = async (req, res) => {
-    const data = await json(req)
-    const results = await friendUpdate(data);
+    const friend = await json(req)
+    const results = await friendUpdate(friend);
     console.log('updateFriend:', results)
     return send(res, 200, results)
 }

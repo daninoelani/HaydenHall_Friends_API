@@ -1,7 +1,4 @@
 {"_id":1,"name":"Hayden","age":"22"}
 {"_id":2,"name":"mike","age":20}
 {"_id":3,"name":"jim","age":"52"}
-{"_id":4,"name":null,"age":null}
-{"_id":5,"name":null,"age":null}
-{"_id":6,"name":null,"age":null}
-{"$$deleted":true,"_id":5}
+{"_id":4,"name":"brad","age":"37"}
